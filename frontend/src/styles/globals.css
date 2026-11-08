@@ -1,0 +1,25 @@
+* { box-sizing: border-box; }
+body { margin: 0; background: #f6f8fa; color: #17212b; font-family: system-ui, sans-serif; }
+main { max-width: 64rem; margin: 4rem auto; padding: 0 1.5rem; }
+h1 { letter-spacing: -0.04em; font-size: clamp(2rem, 5vw, 3rem); }
+p { line-height: 1.6; }
+a { color: #17604e; }
+header { background: white; border-bottom: 1px solid #dce3e0; padding: 1rem 1.5rem; }
+nav { max-width: 61rem; margin: auto; display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
+.brand { font-weight: 700; text-decoration: none; margin-right: auto; }
+.account { display: flex; align-items: center; gap: 1rem; }
+button, .button { border: 0; border-radius: .4rem; padding: .7rem 1rem; background: #17604e; color: white; font: inherit; cursor: pointer; text-decoration: none; display: inline-block; }
+button:disabled { opacity: .6; cursor: wait; }
+input { width: 100%; border: 1px solid #a9b9b2; border-radius: .4rem; padding: .7rem; font: inherit; }
+label { display: block; font-weight: 600; margin: 1.2rem 0 .5rem; }
+small { display: block; color: #53645e; margin: .4rem 0; line-height: 1.5; }
+form button { margin-top: 1.5rem; width: 100%; }
+.card { background: white; border: 1px solid #dce3e0; border-radius: .75rem; padding: 1.5rem; }
+.auth-card { max-width: 27rem; margin: auto; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1rem; margin: 2rem 0; }
+.cards a { text-decoration: none; }
+.cards h2 { font-size: 1.25rem; }
+.text-button { background: transparent; color: #17604e; padding: 1rem 0 0; }
+.error { color: #a32626; }
+.eyebrow { color: #53645e; font-size: .85rem; text-transform: uppercase; letter-spacing: .08em; }
+:focus-visible { outline: 3px solid #cc9400; outline-offset: 3px; }
