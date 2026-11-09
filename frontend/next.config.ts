@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Next requires a finite byte value; use JavaScript's largest safe size.
+  experimental: { proxyClientMaxBodySize: Number.MAX_SAFE_INTEGER },
   async rewrites() {
     return [{
       source: "/api/:path*",

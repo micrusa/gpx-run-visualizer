@@ -23,3 +23,9 @@ form button { margin-top: 1.5rem; width: 100%; }
 .error { color: #a32626; }
 .eyebrow { color: #53645e; font-size: .85rem; text-transform: uppercase; letter-spacing: .08em; }
 :focus-visible { outline: 3px solid #cc9400; outline-offset: 3px; }
+
+.import-history { list-style: none; padding: 0; display: grid; gap: 1rem; }
+.import-heading { display: flex; justify-content: space-between; gap: 1rem; overflow-wrap: anywhere; }
+.run-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); gap: 1rem; }
+.run-summary dt { font-size: .85rem; color: #53645e; }
+.run-summary dd { margin: .4rem 0 0; font-weight: 600; }
