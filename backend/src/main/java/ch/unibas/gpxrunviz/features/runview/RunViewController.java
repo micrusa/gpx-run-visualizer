@@ -1,14 +1,22 @@
 package ch.unibas.gpxrunviz.features.runview;
 
-import ch.unibas.gpxrunviz.exceptions.FeatureNotImplementedException;
+import ch.unibas.gpxrunviz.features.runview.dtos.RunPageResponse;
+import jakarta.validation.constraints.Min;
+import java.security.Principal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 
-/** Placeholder for future runview implementation. */
 @RestController
 public class RunViewController {
-    @GetMapping("/api/runs/{runId}")
-    public void placeholder() {
-        throw new FeatureNotImplementedException();
+    private final RunViewService runs;
+
+    public RunViewController(RunViewService runs) { this.runs = runs; }
+
+    @GetMapping("/api/runs")
+    public RunPageResponse list(Principal principal,
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "20") @Min(1) int size) {
+        return runs.list(principal.getName(), page, size);
     }
 }

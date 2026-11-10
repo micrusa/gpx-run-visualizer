@@ -29,3 +29,11 @@ form button { margin-top: 1.5rem; width: 100%; }
 .run-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); gap: 1rem; }
 .run-summary dt { font-size: .85rem; color: #53645e; }
 .run-summary dd { margin: .4rem 0 0; font-weight: 600; }
+
+.runs-table-scroll { overflow-x: auto; border: 1px solid #dce3e0; border-radius: .75rem; background: white; }
+.runs-table { width: 100%; border-collapse: collapse; }
+.runs-table th, .runs-table td { text-align: left; padding: 1rem; white-space: nowrap; }
+.runs-table th { background: #edf2ef; font-weight: 600; }
+.runs-table tbody tr + tr { border-top: 1px solid #dce3e0; }
+.run-pagination { margin-top: 1rem; justify-content: flex-end; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
