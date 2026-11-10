@@ -8,6 +8,7 @@ import ch.unibas.gpxrunviz.exceptions.InvalidGpxException;
 import ch.unibas.gpxrunviz.exceptions.InvalidImportRequestException;
 import ch.unibas.gpxrunviz.features.auth.UserRepository;
 import ch.unibas.gpxrunviz.features.runview.RunRepository;
+import ch.unibas.gpxrunviz.features.runview.TrackPointRepository;
 import ch.unibas.gpxrunviz.features.imports.dtos.ImportResponse;
 import ch.unibas.gpxrunviz.features.imports.dtos.ParsedTrack;
 import java.io.IOException;

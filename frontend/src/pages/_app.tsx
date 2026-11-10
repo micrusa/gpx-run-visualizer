@@ -1,6 +1,7 @@
 import type { AppProps } from "next/app";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { Layout } from "@/components/layout/Layout";
+import "leaflet/dist/leaflet.css";
 import "@/styles/globals.css";
 
 export default function App({ Component, pageProps }: AppProps) {

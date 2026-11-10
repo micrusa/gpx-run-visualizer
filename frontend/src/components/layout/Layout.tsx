@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useState, type ReactNode } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 
 export function Layout({ children }: { children: ReactNode }) {
   const { user, loading, signOut } = useAuth();
+  const wide = useRouter().pathname === "/runs/[runId]";
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   async function handleLogout() {
@@ -19,6 +21,6 @@ export function Layout({ children }: { children: ReactNode }) {
       <span className="account">{user ? <>{user.username} <button disabled={busy} onClick={handleLogout}>Sign out</button></>
         : !loading && <Link href="/login">Sign in</Link>}</span>
     </nav>{error && <p role="alert" className="error">{error}</p>}</header>
-    <main>{children}</main>
+    <main className={wide ? "run-detail-layout" : undefined}>{children}</main>
   </>;
 }
