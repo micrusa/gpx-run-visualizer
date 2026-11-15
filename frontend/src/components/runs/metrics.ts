@@ -2,11 +2,12 @@ import { formatClock } from "@/components/runs/format";
 
 export type Metric = "paceSecondsPerKm" | "elevationMeters" | "gradePercent" | "heartRate";
 export type XAxis = "distance" | "time";
-export const METRICS: { key: Metric; label: string; unit: string; color: string }[] = [
-  { key: "paceSecondsPerKm", label: "Pace", unit: "/km", color: "#c45127" },
-  { key: "elevationMeters", label: "Elevation", unit: "m", color: "#307d57" },
-  { key: "gradePercent", label: "Grade", unit: "%", color: "#8053ad" },
-  { key: "heartRate", label: "Heart rate", unit: "bpm", color: "#cd3452" },
+// Axis IDs must stay attached to their metric when other metrics are toggled.
+export const METRICS: { key: Metric; axisId: number; label: string; unit: string; color: string }[] = [
+  { key: "paceSecondsPerKm", axisId: 0, label: "Pace", unit: "/km", color: "#c45127" },
+  { key: "elevationMeters", axisId: 1, label: "Elevation", unit: "m", color: "#307d57" },
+  { key: "gradePercent", axisId: 2, label: "Grade", unit: "%", color: "#8053ad" },
+  { key: "heartRate", axisId: 3, label: "Heart rate", unit: "bpm", color: "#cd3452" },
 ];
 
 export function metricValue(key: Metric, value: number) {

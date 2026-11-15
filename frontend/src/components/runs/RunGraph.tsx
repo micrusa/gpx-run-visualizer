@@ -58,7 +58,7 @@ export const RunGraph = memo(function RunGraph({ points, selected, xAxis, onHove
           <ChartXAxis dataKey="x" type="number" domain={visibleX} allowDataOverflow
             tickFormatter={value => xAxis === "time" ? formatClock(Number(value)) : Number(value).toFixed(1)}
             label={{ value: xAxis === "time" ? "Time (min:sec)" : "Distance (km)", position: "insideBottom", offset: -14 }} />
-          {metrics.map((metric, index) => <YAxis key={metric.key} yAxisId={index}
+          {metrics.map((metric, index) => <YAxis key={metric.key} yAxisId={metric.axisId}
             orientation={index % 2 ? "right" : "left"} width={AXIS_WIDTH} domain={visibleY[metric.key]} allowDataOverflow
             reversed={metric.key === "paceSecondsPerKm"} tick={{ fill: metric.color, fontSize: 12 }}
             tickFormatter={value => metricValue(metric.key, Number(value))} />)}
@@ -68,7 +68,7 @@ export const RunGraph = memo(function RunGraph({ points, selected, xAxis, onHove
               return [metric && typeof value === "number" ? metricValue(metric.key, value) : "—", name];
             }} />
           <Legend verticalAlign="top" height={36} />
-          {metrics.map((metric, index) => <Line key={metric.key} dataKey={metric.key} yAxisId={index} name={metric.label}
+          {metrics.map(metric => <Line key={metric.key} dataKey={metric.key} yAxisId={metric.axisId} name={metric.label}
             stroke={metric.color} strokeWidth={1.5} dot={false} connectNulls={false} isAnimationActive={false} />)}
           <RunChartSelection onSelect={(from, to) => {
             const range = selectRange(points, xAxis, from, to, selection);
