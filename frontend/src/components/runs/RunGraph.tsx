@@ -3,19 +3,19 @@ import { ResponsiveContainer, LineChart, Line, XAxis as ChartXAxis, YAxis, Carte
 import { selectRange, type RunSelection } from "@/lib/runSelectionService";
 import { RunChartSelection } from "@/components/runs/RunChartSelection";
 import { type RunPoint } from "@/lib/runService";
-import { chartData } from "@/components/runs/chartData";
+import { chartData, type ChartSettings } from "@/components/runs/chartData";
 import { chartDomain, type Domain } from "@/components/runs/chartScale";
 import { RunChartGestures, AXIS_WIDTH, type ScaleUpdate } from "@/components/runs/RunChartGestures";
 import { formatClock } from "@/components/runs/format";
 import { METRICS, metricValue, type Metric, type XAxis } from "@/components/runs/metrics";
 
 type Props = {
-  points: RunPoint[]; selected: Metric[]; xAxis: XAxis; onHover: (index: number | null) => void;
+  settings: ChartSettings; points: RunPoint[]; selected: Metric[]; xAxis: XAxis; onHover: (index: number | null) => void;
   selection: RunSelection | null; onSelect: (selection: RunSelection) => void; onBack: () => void;
 };
 
-export const RunGraph = memo(function RunGraph({ points, selected, xAxis, onHover, selection, onSelect, onBack }: Props) {
-  const data = useMemo(() => chartData(points, xAxis, selection), [points, xAxis, selection]);
+export const RunGraph = memo(function RunGraph({ points, selected, xAxis, onHover, selection, onSelect, onBack, settings }: Props) {
+  const data = useMemo(() => chartData(points, xAxis, selection, settings), [points, xAxis, selection, settings]);
   const domains = useMemo(() => Object.fromEntries(METRICS.map(metric =>
     [metric.key, chartDomain(data, metric.key)])) as Record<Metric, [number, number]>, [data]);
   const [manual, setManual] = useState<Partial<Record<Metric | XAxis, Domain>>>({});
@@ -41,6 +41,8 @@ export const RunGraph = memo(function RunGraph({ points, selected, xAxis, onHove
     {selection && <button onClick={onBack}>Back</button>}</div>;
   if (!selected.length) return <>{header}<p>Select a value to display in the graph.</p></>;
   if (!data.length) return <>{header}<p>No samples available for this X axis.</p></>;
+  if (!metrics.some(metric => data.some(point => point[metric.key] != null)))
+    return <>{header}<p>No graph values for this period. Adjust point filtering or select another value.</p></>;
   return <>
     {header}
     <small>Drag the graph to select. Drag axes to move; Shift-drag to scale. Double-click the graph to unzoom.</small>

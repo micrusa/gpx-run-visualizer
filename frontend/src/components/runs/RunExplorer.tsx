@@ -6,6 +6,7 @@ import { type RunDetail } from "@/lib/runService";
 import { formatClock, formatStartDate } from "@/components/runs/format";
 import { METRICS, type Metric, type XAxis } from "@/components/runs/metrics";
 import { RunDisplayControls } from "@/components/runs/RunDisplayControls";
+import { DEFAULT_CHART_SETTINGS } from "@/components/runs/chartData";
 import { RunGraph } from "@/components/runs/RunGraph";
 
 const RunMap = dynamic(() => import("@/components/runs/RunMap"), {
@@ -18,6 +19,7 @@ export function RunExplorer({ run }: { run: RunDetail }) {
     const defaults = available.filter(key => key === "paceSecondsPerKm" || key === "elevationMeters");
     return defaults.length ? defaults : available.slice(0, 1);
   });
+  const [settings, setSettings] = useState(DEFAULT_CHART_SETTINGS);
   const [xAxis, setXAxis] = useState<XAxis>("distance");
   const [hovered, setHovered] = useState<number | null>(null);
   const [selections, setSelections] = useState<RunSelection[]>([]);
@@ -46,10 +48,10 @@ export function RunExplorer({ run }: { run: RunDetail }) {
         <section aria-label="Run route"><RunMap points={run.points} hovered={hovered} selection={selection} /></section>
         <section className="run-graph-panel" aria-label="Run graph">
           <RunGraph key={selection ? `${selection.start}:${selection.end}` : "full"} points={run.points}
-            selected={selected} xAxis={xAxis} onHover={setHovered} selection={selection} onSelect={selectPeriod} onBack={back} />
+            selected={selected} xAxis={xAxis} settings={settings} onHover={setHovered} selection={selection} onSelect={selectPeriod} onBack={back} />
         </section>
       </div>
-      <RunDisplayControls available={available} selected={selected} onSelected={setSelected}
+      <RunDisplayControls settings={settings} onSettings={setSettings} available={available} selected={selected} onSelected={setSelected}
         xAxis={xAxis} onXAxis={axis => { setHovered(null); setXAxis(axis); }} hasTime={hasTime}>
         {selection && <RunSelectionSummary points={run.points} selection={selection} />}
       </RunDisplayControls>

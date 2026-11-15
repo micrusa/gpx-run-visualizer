@@ -1,6 +1,6 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const { chartData } = require('../src/components/runs/chartData.ts');
+const { chartData, DEFAULT_CHART_SETTINGS } = require('../src/components/runs/chartData.ts');
 const { chartDomain } = require('../src/components/runs/chartScale.ts');
 
 function point(index, gradePercent, overrides = {}) {
@@ -35,10 +35,13 @@ test('both X axes show the same smoothed grades and preserve missing-time gaps',
   assert.equal(time.filter(row => row.index === null).length, 1);
 });
 
-test('a pause spike does not expand pace scales or erase the original tooltip value', () => {
+test('with filtering and pace smoothing disabled, spikes retain raw tooltip values', () => {
   const points = Array.from({ length: 50 }, (_, index) => point(index, 0, { paceSecondsPerKm: [290, 300, 305, 310][index % 4] }));
   points[25].paceSecondsPerKm = 100000;
-  const rows = chartData(points, 'distance');
+  const settings = structuredClone(DEFAULT_CHART_SETTINGS);
+  settings.pointFilter.enabled = false;
+  settings.smoothing.paceSecondsPerKm.enabled = false;
+  const rows = chartData(points, 'distance', null, settings);
   const [low, high] = chartDomain(rows, 'paceSecondsPerKm');
   assert.ok(low <= 290 && high >= 310 && high < 1000);
   assert.equal(rows[25].paceSecondsPerKm, 100000);

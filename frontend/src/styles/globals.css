@@ -76,3 +76,15 @@ main.run-detail-layout { max-width: 100rem; padding: 0 1rem; margin-top: 2rem; }
 .run-selection-summary dl { display: grid; gap: .8rem; margin-bottom: 0; }
 .run-selection-summary dt { color: #53645e; font-size: .85rem; }
 .run-selection-summary dd { margin: .2rem 0 0; font-weight: 600; }
+
+.run-metric-option { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: .5rem; }
+.run-config-button { display: grid; place-items: center; width: 2rem; height: 2rem; padding: 0; border: 1px solid #dce3e0; background: transparent; color: #53645e; }
+.run-config-button:hover, .run-config-button[aria-expanded="true"] { background: #edf2ef; color: #17604e; }
+
+.run-settings-dialog { width: min(20rem, calc(100vw - 2rem)); max-height: calc(100dvh - 2rem); overflow-y: auto; padding: 1.25rem; border: 1px solid #dce3e0; border-radius: .75rem; background: white; color: #17212b; box-shadow: 0 1rem 3rem #17212b26; }
+.run-settings-dialog::backdrop { background: #17212b40; }
+.run-settings-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.run-settings-dialog h2 { font-size: 1.05rem; margin: 0; }
+.run-settings-close { background: transparent; color: #53645e; padding: .2rem .5rem; font-size: 1.5rem; line-height: 1; }
+.run-settings-dialog label:not(.run-option) { margin: .75rem 0 .5rem; font-size: .85rem; font-weight: 400; }
+.run-settings-dialog .run-option { margin-top: 0; }
