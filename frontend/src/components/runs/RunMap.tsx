@@ -19,7 +19,7 @@ export default function RunMap({ points, hovered, selection }: Props) {
     return result;
   }, [visible]);
   const bounds = useMemo(() => latLngBounds(segments.flat()), [segments]);
-  if (!visible.length) return <p>No route points available.</p>;
+  if (!visible.length) return <p>No route points.</p>;
   const position = (point: RunPoint): LatLngTuple => [point.latitude, point.longitude];
   const active = hovered == null ? null : points[hovered];
   return <MapContainer className="run-map" bounds={bounds} boundsOptions={{ padding: [24, 24], maxZoom: 16 }}

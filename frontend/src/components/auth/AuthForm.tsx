@@ -26,7 +26,7 @@ export function AuthForm() {
   }
   return (
     <section className="card auth-card">
-      <h2>{mode === "login" ? "Welcome back" : "Create your account"}</h2>
+      <h2>{mode === "login" ? "Sign in" : "Create account"}</h2>
       <form onSubmit={submit}>
         <label htmlFor="username">Username</label>
         <input id="username" autoComplete="username" required minLength={3} maxLength={50}
@@ -38,13 +38,13 @@ export function AuthForm() {
           required minLength={mode === "register" ? 8 : undefined} maxLength={128}
           value={password} onChange={e => setPassword(e.target.value)} disabled={busy}
           aria-describedby={mode === "register" ? "password-help" : undefined} />
-        {mode === "register" && <small id="password-help">Use 8–128 characters.</small>}
+        {mode === "register" && <small id="password-help">8–128 characters</small>}
         {error && <p role="alert" className="error">{error}</p>}
         <button type="submit" disabled={busy}>{busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}</button>
       </form>
       <button className="text-button" disabled={busy} onClick={() => {
         setMode(mode === "login" ? "register" : "login"); setError(""); setPassword("");
-      }}>{mode === "login" ? "New here? Create an account" : "Already registered? Sign in"}</button>
+      }}>{mode === "login" ? "Create an account" : "Back to sign in"}</button>
     </section>
   );
 }

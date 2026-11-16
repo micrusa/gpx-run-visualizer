@@ -8,14 +8,14 @@ export type PaceFilterCounts = { hidden: number; total: number; isSelection: boo
 export function RunPointFiltering({ value, counts, onChange }: { value: PointFilter; counts: PaceFilterCounts; onChange: (filter: PointFilter) => void }) {
   const [open, setOpen] = useState(false);
   const id = "pace-filter-settings";
-  return <fieldset className="run-point-filtering"><legend>Point filtering</legend>
+  return <fieldset className="run-point-filtering"><legend>Filter</legend>
     <div className="run-metric-option">
       <label className="run-option"><input id="pace-filter-enabled" type="checkbox" checked={value.enabled}
         onChange={event => onChange({ ...value, enabled: event.target.checked })} />Filter by pace</label>
       <RunConfigButton label="Configure pace filter" dialogId={id} open={open} onClick={() => setOpen(true)} />
     </div>
     {value.enabled && <small role="status">
-      {counts.hidden.toLocaleString()} of {counts.total.toLocaleString()} {counts.isSelection ? "selected" : "run"} samples excluded by this filter.
+      {counts.hidden.toLocaleString()} of {counts.total.toLocaleString()} {counts.isSelection ? "selected" : "run"} samples excluded
     </small>}
     <RunSettingsDialog id={id} title="Filter by pace" open={open} onClose={() => setOpen(false)}>
       <label className="run-option"><input id="pace-filter-dialog-enabled" type="checkbox" checked={value.enabled}

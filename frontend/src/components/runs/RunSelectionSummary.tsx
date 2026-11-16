@@ -8,7 +8,7 @@ export function RunSelectionSummary({ points, selection }: { points: RunPoint[];
   const summary = useMemo(() => selectionSummary(points, selection), [points, selection]);
   return <section className="run-selection-summary" aria-label="Selected period averages">
     <h2>Selection</h2>
-    <small>Based on original samples before chart filtering or smoothing.</small>
+    <small>Original samples</small>
     <dl>
       <div><dt>Distance</dt><dd>{(summary.distanceMeters / 1000).toFixed(2)} km</dd></div>
       <div><dt>Elapsed time</dt><dd>{summary.durationSeconds == null ? "—" : formatClock(summary.durationSeconds)}</dd></div>

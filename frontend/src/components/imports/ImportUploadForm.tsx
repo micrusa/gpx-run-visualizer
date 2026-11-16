@@ -26,7 +26,7 @@ export function ImportUploadForm({ disabled, onImported }: Props) {
       <label htmlFor="gpx-files">GPX files</label>
       <input id="gpx-files" type="file" accept=".gpx" multiple required disabled={busy || disabled}
         aria-describedby="upload-help" onChange={event => setFiles(Array.from(event.target.files ?? []))} />
-      <small id="upload-help">Select one or more GPX files. Multiple tracks become separate runs.</small>
+      <small id="upload-help">One run per track</small>
       <button type="submit" disabled={busy || disabled || !files.length}>
         {busy ? "Importing…" : `Import${files.length ? ` ${files.length} file${files.length === 1 ? "" : "s"}` : " files"}`}
       </button>

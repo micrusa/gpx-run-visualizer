@@ -21,7 +21,7 @@ export function RunsPanel() {
     <h1>Runs</h1>
     {loading ? <p role="status">Loading runs…</p>
       : error ? <p role="alert">{error} <button onClick={() => setAttempt(attempt + 1)}>Retry</button></p>
-      : !result?.totalElements ? <p>No runs yet. <Link href="/imports">Import GPX files</Link> to get started.</p>
+      : !result?.totalElements ? <p>No runs yet. <Link href="/imports">Import GPX files</Link></p>
       : <>
         <RunsTable runs={result.content} />
         <nav className="run-pagination" aria-label="Run pages">

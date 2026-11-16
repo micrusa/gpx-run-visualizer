@@ -33,9 +33,8 @@ export const RunRegression = memo(function RunRegression({ points, selection, se
     if (value === y) setY(x);
   }
   return <section className="run-graph-panel" aria-labelledby="regression-heading">
-    <h2 id="regression-heading">Regression Curves</h2>
-    <small>Explore how two measurements relate. Dots are samples; the line is a linear best fit.</small>
-    {available.length < 2 ? <p>This run needs at least two recorded measurements to compare.</p> : <>
+    <h2 id="regression-heading">Regression</h2>
+    {available.length < 2 ? <p>Two recorded metrics needed.</p> : <>
       <div className="regression-controls">
         <label>X variable<select value={x} onChange={event => chooseX(event.target.value as Metric)}>
           {available.map(metric => <option key={metric.key} value={metric.key}>{metric.label} ({metric.unit})</option>)}
@@ -44,8 +43,8 @@ export const RunRegression = memo(function RunRegression({ points, selection, se
           {available.filter(metric => metric.key !== x).map(metric => <option key={metric.key} value={metric.key}>{metric.label} ({metric.unit})</option>)}
         </select></label>
       </div>
-      <small>{selection ? "Selected period" : "Full run"} · Uses the graph’s filtering and smoothing settings.</small>
-      {!fit ? <p role="status">Choose another pair or a wider period. A correlation needs at least three paired samples and variation in both variables.</p> : <>
+      <small>{selection ? "Selected period" : "Full run"} · Filtered and smoothed when enabled</small>
+      {!fit ? <p role="status">Need 3+ paired samples with variation</p> : <>
         <p className="regression-summary" role="status"><strong>r = {fit.r.toFixed(2)}</strong><span>R² = {fit.rSquared.toFixed(2)}</span><span>{fit.samples.length.toLocaleString()} paired samples</span>{dots.length < fit.samples.length && <span>{dots.length.toLocaleString()} dots shown</span>}</p>
         <div className="run-chart-scroll"><div className="run-chart">
           <ResponsiveContainer width="100%" height="100%" minWidth={0}>

@@ -45,13 +45,17 @@ export const RunGraph = memo(function RunGraph({ points, selected, xAxis, onHove
   const metrics = METRICS.filter(metric => selected.includes(metric.key));
   const header = <div className="run-graph-toolbar"><h2>Run graph</h2>
     {selection && <button onClick={onBack}>Back</button>}</div>;
-  if (!selected.length) return <>{header}<p>Select a value to display in the graph.</p></>;
-  if (!data.length) return <>{header}<p>No samples available for this X axis.</p></>;
+  if (!selected.length) return <>{header}<p>Select a metric.</p></>;
+  if (!data.length) return <>{header}<p>No samples on this axis.</p></>;
   if (!metrics.some(metric => data.some(point => point[metric.key] != null)))
-    return <>{header}<p>No graph values for this period. Adjust point filtering or select another value.</p></>;
+    return <>{header}<p>No data for these settings</p></>;
   return <>
     {header}
-    <small>Drag the graph to select. Drag axes to move; Shift-drag to scale. Double-click the graph to unzoom.</small>
+    <ul className="run-graph-hints">
+      <li>Drag plot to select</li>
+      <li>Drag axis to pan · Shift-drag to scale</li>
+      <li>Double-click to reset</li>
+    </ul>
     <div className="run-chart-scroll"><div className="run-chart">
       <ResponsiveContainer width="100%" height="100%" minWidth={0} onResize={setWidth}>
         <LineChart data={rendered} accessibilityLayer margin={{ top: 12, right: 8, bottom: 24, left: 8 }}
