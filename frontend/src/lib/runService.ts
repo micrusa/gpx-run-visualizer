@@ -1,7 +1,7 @@
 import { ApiError, get } from "@/lib/api";
 
 export type Run = {
-  id: number; startedAt: string | null; distanceMeters: number;
+  id: number; name?: string; startedAt: string | null; distanceMeters: number;
   durationSeconds: number | null; averagePaceSecondsPerKm: number | null;
   elevationGainMeters: number | null; averageHeartRate: number | null;
 };

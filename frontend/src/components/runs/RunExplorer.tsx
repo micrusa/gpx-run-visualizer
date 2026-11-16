@@ -42,7 +42,7 @@ export function RunExplorer({ run }: { run: RunDetail }) {
     return false;
   }, [run.points, selection]);
   return <>
-    <h1>Run</h1>
+    <h1 className="run-title">{run.summary.name?.trim() || "Run"}</h1>
     <p className="run-detail-summary">
       {run.summary.startedAt && <time dateTime={run.summary.startedAt}>{formatStartDate(run.summary.startedAt)}</time>}
       <span>{(run.summary.distanceMeters / 1000).toFixed(2)} km</span>

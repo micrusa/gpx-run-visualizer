@@ -9,7 +9,7 @@ export function RunsTable({ runs }: { runs: Run[] }) {
     <table className="runs-table">
       <caption className="sr-only">Your runs, newest first</caption>
       <thead><tr>
-        <th scope="col">Start date</th><th scope="col">Distance</th>
+        <th scope="col">Run</th><th scope="col">Distance</th>
         <th scope="col">Elapsed time</th><th scope="col">Elapsed pace</th>
         <th scope="col">Elevation gain</th><th scope="col">Avg. heart rate</th>
       </tr></thead>
@@ -17,8 +17,9 @@ export function RunsTable({ runs }: { runs: Run[] }) {
         if ((event.target as HTMLElement).closest("a")) return;
         void router.push(`/runs/${run.id}`);
       }}>
-        <td><Link href={`/runs/${run.id}`} aria-label={run.startedAt ? `Open run from ${formatStartDate(run.startedAt)}` : "Open run"}>
-          {run.startedAt ? <time dateTime={run.startedAt}>{formatStartDate(run.startedAt)}</time> : "—"}
+        <td className="run-name"><Link href={`/runs/${run.id}`}>
+          {run.name?.trim() || "Run"}
+          {run.startedAt && <time dateTime={run.startedAt}>{formatStartDate(run.startedAt)}</time>}
         </Link></td>
         <td>{(run.distanceMeters / 1000).toFixed(2)} km</td>
         <td>{run.durationSeconds == null ? "—" : formatClock(run.durationSeconds)}</td>

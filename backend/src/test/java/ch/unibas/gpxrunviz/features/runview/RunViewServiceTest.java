@@ -20,6 +20,7 @@ class RunViewServiceTest {
     private void ownedRun() {
         Run run = mock(Run.class);
         when(run.getId()).thenReturn(7L);
+        when(run.getName()).thenReturn("Hill loop");
         when(run.getSummary()).thenReturn(new RunSummary(start, start.plusSeconds(180), 5,
             42, 180.0, 300.0, 10.0, 0.0, 100.0, 200.0, 130.0, 140));
         when(runs.findByIdAndOwnerUsername(7L, "runner")).thenReturn(Optional.of(run));
@@ -35,6 +36,7 @@ class RunViewServiceTest {
             new StoredTrackPoint(4, 1, 1, 1.01, null, null, null)));
         var detail = service.detail("runner", 7L);
         var samples = detail.points();
+        assertEquals("Hill loop", detail.summary().name());
         assertEquals(42, detail.summary().distanceMeters()); // Existing stored summaries are reused.
         assertEquals(0, samples.getFirst().distanceMeters());
         assertEquals(0.0, samples.getFirst().timeSeconds());
