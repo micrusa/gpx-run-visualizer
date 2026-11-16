@@ -18,7 +18,7 @@ export function Layout({ children }: { children: ReactNode }) {
     <header><nav aria-label="Main navigation">
       <Link href="/" className="brand">GPX Run Visualizer</Link>
       {user && <><Link href="/imports">Imports</Link><Link href="/charts">Charts</Link><Link href="/runs">Run view</Link></>}
-      <span className="account">{user ? <>{user.username} <button disabled={busy} onClick={handleLogout}>Sign out</button></>
+      <span className="account">{user ? <button disabled={busy} onClick={handleLogout}>Sign out</button>
         : !loading && <Link href="/login">Sign in</Link>}</span>
     </nav>{error && <p role="alert" className="error">{error}</p>}</header>
     <main className={wide ? "run-detail-layout" : undefined}>{children}</main>
