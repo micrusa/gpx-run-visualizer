@@ -88,3 +88,8 @@ main.run-detail-layout { max-width: 100rem; padding: 0 1rem; margin-top: 2rem; }
 .run-settings-close { background: transparent; color: #53645e; padding: .2rem .5rem; font-size: 1.5rem; line-height: 1; }
 .run-settings-dialog label:not(.run-option) { margin: .75rem 0 .5rem; font-size: .85rem; font-weight: 400; }
 .run-settings-dialog .run-option { margin-top: 0; }
+
+.regression-controls { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
+.regression-controls label { flex: 1 1 12rem; margin: .75rem 0 0; }
+.regression-controls select { display: block; width: 100%; margin-top: .5rem; padding: .65rem; border: 1px solid #a9b9b2; border-radius: .4rem; background: white; color: inherit; font: inherit; }
+.regression-summary { display: flex; flex-wrap: wrap; gap: 1rem; font-size: .9rem; }

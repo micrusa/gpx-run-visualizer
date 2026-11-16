@@ -21,8 +21,7 @@ export type ChartPoint = {
   elevationMeters: number | null; gradePercent: number | null; heartRate: number | null;
 };
 
-export function chartData(points: RunPoint[], axis: XAxis, selection: RunSelection | null = null, settings: ChartSettings = DEFAULT_CHART_SETTINGS): ChartPoint[] {
-  const values = graphValues(points, settings);
+export function chartData(points: RunPoint[], axis: XAxis, selection: RunSelection | null = null, settings: ChartSettings = DEFAULT_CHART_SETTINGS, values = graphValues(points, settings)): ChartPoint[] {
   const result: ChartPoint[] = [];
   let previousSegment: number | null = null;
   let gap = false;
@@ -41,7 +40,7 @@ export function chartData(points: RunPoint[], axis: XAxis, selection: RunSelecti
 }
 
 // Filtering precedes smoothing so a pause cannot bleed into nearby moving samples.
-function graphValues(points: RunPoint[], settings: ChartSettings): Record<Metric, (number | null)[]> {
+export function graphValues(points: RunPoint[], settings: ChartSettings): Record<Metric, (number | null)[]> {
   const filter = settings.pointFilter;
   const excluded = points.map((point, index) => {
     if (!filter.enabled || !Number.isFinite(filter.maxPaceSecondsPerKm) || filter.maxPaceSecondsPerKm <= 0) return false;

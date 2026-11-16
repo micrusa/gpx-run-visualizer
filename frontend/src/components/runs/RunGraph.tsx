@@ -3,19 +3,23 @@ import { ResponsiveContainer, LineChart, Line, XAxis as ChartXAxis, YAxis, Carte
 import { selectRange, type RunSelection } from "@/lib/runSelectionService";
 import { RunChartSelection } from "@/components/runs/RunChartSelection";
 import { type RunPoint } from "@/lib/runService";
-import { chartData, type ChartSettings } from "@/components/runs/chartData";
+import { chartData, type graphValues, type ChartSettings } from "@/components/runs/chartData";
 import { chartDomain, type Domain } from "@/components/runs/chartScale";
 import { RunChartGestures, AXIS_WIDTH, type ScaleUpdate } from "@/components/runs/RunChartGestures";
 import { formatClock } from "@/components/runs/format";
 import { METRICS, metricValue, type Metric, type XAxis } from "@/components/runs/metrics";
 
+import { sampleChart } from "@/components/runs/chartSampling";
+import { useAnimationFrame } from "@/components/runs/useAnimationFrame";
+
 type Props = {
+  values: ReturnType<typeof graphValues>;
   settings: ChartSettings; points: RunPoint[]; selected: Metric[]; xAxis: XAxis; onHover: (index: number | null) => void;
   selection: RunSelection | null; onSelect: (selection: RunSelection) => void; onBack: () => void;
 };
 
-export const RunGraph = memo(function RunGraph({ points, selected, xAxis, onHover, selection, onSelect, onBack, settings }: Props) {
-  const data = useMemo(() => chartData(points, xAxis, selection, settings), [points, xAxis, selection, settings]);
+export const RunGraph = memo(function RunGraph({ points, selected, xAxis, onHover, selection, onSelect, onBack, settings, values }: Props) {
+  const data = useMemo(() => chartData(points, xAxis, selection, settings, values), [points, xAxis, selection, settings, values]);
   const domains = useMemo(() => Object.fromEntries(METRICS.map(metric =>
     [metric.key, chartDomain(data, metric.key)])) as Record<Metric, [number, number]>, [data]);
   const [manual, setManual] = useState<Partial<Record<Metric | XAxis, Domain>>>({});
@@ -26,9 +30,11 @@ export const RunGraph = memo(function RunGraph({ points, selected, xAxis, onHove
   }, [data]);
   const visibleX = manual[xAxis] ?? automaticX;
   const visibleY = { ...domains, ...manual } as Record<Metric, Domain>;
-  function changeScales(update: ScaleUpdate) {
+  const [width, setWidth] = useState(800);
+  const rendered = useMemo(() => sampleChart(data, selected, width, visibleX), [data, selected, width, visibleX]);
+  const changeScales = useAnimationFrame((update: ScaleUpdate) => {
     setManual(previous => ({ ...previous, ...update.y, ...(update.x ? { [xAxis]: update.x } : {}) }));
-  }
+  });
   function resetScales(axis: Metric | "x") {
     setManual(previous => {
       const next = { ...previous };
@@ -47,12 +53,12 @@ export const RunGraph = memo(function RunGraph({ points, selected, xAxis, onHove
     {header}
     <small>Drag the graph to select. Drag axes to move; Shift-drag to scale. Double-click the graph to unzoom.</small>
     <div className="run-chart-scroll"><div className="run-chart">
-      <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-        <LineChart data={data} accessibilityLayer margin={{ top: 12, right: 8, bottom: 24, left: 8 }}
+      <ResponsiveContainer width="100%" height="100%" minWidth={0} onResize={setWidth}>
+        <LineChart data={rendered} accessibilityLayer margin={{ top: 12, right: 8, bottom: 24, left: 8 }}
           onMouseMove={state => {
             if (dragging) return;
             const index = state.activeTooltipIndex == null ? null : Number(state.activeTooltipIndex);
-            onHover(index == null ? null : data[index]?.index ?? null);
+            onHover(index == null ? null : rendered[index]?.index ?? null);
           }} onMouseLeave={() => onHover(null)}>
           <CartesianGrid strokeDasharray="3 3" stroke="#dce3e0" />
           <ChartXAxis dataKey="x" type="number" domain={visibleX} allowDataOverflow

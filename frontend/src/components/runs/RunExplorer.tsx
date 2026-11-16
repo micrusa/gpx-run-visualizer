@@ -1,13 +1,16 @@
 import dynamic from "next/dynamic";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { type RunSelection } from "@/lib/runSelectionService";
 import { RunSelectionSummary } from "@/components/runs/RunSelectionSummary";
 import { type RunDetail } from "@/lib/runService";
 import { formatClock, formatStartDate } from "@/components/runs/format";
 import { METRICS, type Metric, type XAxis } from "@/components/runs/metrics";
 import { RunDisplayControls } from "@/components/runs/RunDisplayControls";
-import { DEFAULT_CHART_SETTINGS } from "@/components/runs/chartData";
+import { DEFAULT_CHART_SETTINGS, graphValues } from "@/components/runs/chartData";
 import { RunGraph } from "@/components/runs/RunGraph";
+
+import { useAnimationFrame } from "@/components/runs/useAnimationFrame";
+import { RunRegression } from "@/components/runs/RunRegression";
 
 const RunMap = dynamic(() => import("@/components/runs/RunMap"), {
   ssr: false, loading: () => <div className="run-map-loading" role="status">Loading map…</div>,
@@ -20,15 +23,17 @@ export function RunExplorer({ run }: { run: RunDetail }) {
     return defaults.length ? defaults : available.slice(0, 1);
   });
   const [settings, setSettings] = useState(DEFAULT_CHART_SETTINGS);
+  const values = useMemo(() => graphValues(run.points, settings), [run.points, settings]);
   const [xAxis, setXAxis] = useState<XAxis>("distance");
   const [hovered, setHovered] = useState<number | null>(null);
   const [selections, setSelections] = useState<RunSelection[]>([]);
   const selection = selections[selections.length - 1] ?? null;
-  function selectPeriod(range: RunSelection) {
+  const onHover = useAnimationFrame(setHovered);
+  const selectPeriod = useCallback((range: RunSelection) => {
     if (selection?.start === range.start && selection.end === range.end) return;
-    setHovered(null); setSelections(previous => [...previous, range]);
-  }
-  function back() { setHovered(null); setSelections(previous => previous.slice(0, -1)); }
+    onHover(null); setSelections(previous => [...previous, range]);
+  }, [selection, onHover]);
+  const back = useCallback(() => { onHover(null); setSelections(previous => previous.slice(0, -1)); }, [onHover]);
   const hasTime = useMemo(() => {
     let count = 0;
     for (let index = selection?.start ?? 0; index <= (selection?.end ?? run.points.length - 1); index++) {
@@ -48,11 +53,12 @@ export function RunExplorer({ run }: { run: RunDetail }) {
         <section aria-label="Run route"><RunMap points={run.points} hovered={hovered} selection={selection} /></section>
         <section className="run-graph-panel" aria-label="Run graph">
           <RunGraph key={selection ? `${selection.start}:${selection.end}` : "full"} points={run.points}
-            selected={selected} xAxis={xAxis} settings={settings} onHover={setHovered} selection={selection} onSelect={selectPeriod} onBack={back} />
+            selected={selected} xAxis={xAxis} settings={settings} values={values} onHover={onHover} selection={selection} onSelect={selectPeriod} onBack={back} />
         </section>
+        <RunRegression points={run.points} selection={selection} settings={settings} values={values} />
       </div>
       <RunDisplayControls settings={settings} onSettings={setSettings} available={available} selected={selected} onSelected={setSelected}
-        xAxis={xAxis} onXAxis={axis => { setHovered(null); setXAxis(axis); }} hasTime={hasTime}>
+        xAxis={xAxis} onXAxis={axis => { onHover(null); setXAxis(axis); }} hasTime={hasTime}>
         {selection && <RunSelectionSummary points={run.points} selection={selection} />}
       </RunDisplayControls>
     </div>
