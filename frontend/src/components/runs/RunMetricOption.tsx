@@ -14,6 +14,6 @@ export function RunMetricOption({ metric, available, checked, onChecked, smoothi
       <span style={{ color: metric.color }}>{metric.label}</span>
       {!available && <small>Unavailable</small>}
     </label>
-    <MetricConfiguration metric={metric.key} label={metric.label} value={smoothing} onChange={onSmoothing} />
+    {available && <MetricConfiguration metric={metric.key} label={metric.label} value={smoothing} onChange={onSmoothing} />}
   </div>;
 }
