@@ -6,7 +6,7 @@ import { type RunDetail } from "@/lib/runService";
 import { formatClock, formatStartDate } from "@/components/runs/format";
 import { METRICS, type Metric, type XAxis } from "@/components/runs/metrics";
 import { RunDisplayControls } from "@/components/runs/RunDisplayControls";
-import { DEFAULT_CHART_SETTINGS, graphValues } from "@/components/runs/chartData";
+import { DEFAULT_CHART_SETTINGS, graphValues, paceFilterExclusions } from "@/components/runs/chartData";
 import { RunGraph } from "@/components/runs/RunGraph";
 
 import { useAnimationFrame } from "@/components/runs/useAnimationFrame";
@@ -23,11 +23,21 @@ export function RunExplorer({ run }: { run: RunDetail }) {
     return defaults.length ? defaults : available.slice(0, 1);
   });
   const [settings, setSettings] = useState(DEFAULT_CHART_SETTINGS);
-  const values = useMemo(() => graphValues(run.points, settings), [run.points, settings]);
+  const excluded = useMemo(() => paceFilterExclusions(run.points, settings.pointFilter), [run.points, settings.pointFilter]);
+  const values = useMemo(() => graphValues(run.points, settings, excluded), [run.points, settings, excluded]);
   const [xAxis, setXAxis] = useState<XAxis>("distance");
   const [hovered, setHovered] = useState<number | null>(null);
   const [selections, setSelections] = useState<RunSelection[]>([]);
   const selection = selections[selections.length - 1] ?? null;
+  const filterCounts = useMemo(() => {
+    const start = selection?.start ?? 0;
+    const end = selection?.end ?? excluded.length - 1;
+    let hidden = 0;
+    for (let index = start; index <= end; index++) {
+      if (excluded[index]) hidden++;
+    }
+    return { hidden, total: end - start + 1, isSelection: selection != null };
+  }, [excluded, selection]);
   const onHover = useAnimationFrame(setHovered);
   const selectPeriod = useCallback((range: RunSelection) => {
     if (selection?.start === range.start && selection.end === range.end) return;
@@ -57,7 +67,7 @@ export function RunExplorer({ run }: { run: RunDetail }) {
         </section>
         <RunRegression points={run.points} selection={selection} settings={settings} values={values} />
       </div>
-      <RunDisplayControls settings={settings} onSettings={setSettings} available={available} selected={selected} onSelected={setSelected}
+      <RunDisplayControls settings={settings} onSettings={setSettings} filterCounts={filterCounts} available={available} selected={selected} onSelected={setSelected}
         xAxis={xAxis} onXAxis={axis => { onHover(null); setXAxis(axis); }} hasTime={hasTime}>
         {selection && <RunSelectionSummary points={run.points} selection={selection} />}
       </RunDisplayControls>

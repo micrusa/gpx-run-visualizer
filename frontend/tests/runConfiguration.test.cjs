@@ -64,7 +64,8 @@ test('smoothing can be enabled, disabled, and assigned a valid integer window', 
 test('pause filtering defaults to 12 min/km and supports editing and disabling', () => {
   const { RunPointFiltering } = load('RunPointFiltering.tsx');
   const changes = [];
-  const tree = RunPointFiltering({ value: DEFAULT_CHART_SETTINGS.pointFilter, onChange: value => changes.push(value) });
+  const tree = RunPointFiltering({ value: DEFAULT_CHART_SETTINGS.pointFilter,
+    counts: { hidden: 2, total: 10, isSelection: false }, onChange: value => changes.push(value) });
   const inputs = find(tree, element => element.type === 'input');
   const enabled = inputs.find(input => input.props.id === 'pace-filter-enabled');
   const cutoff = inputs.find(input => input.props.id === 'pace-cutoff');
@@ -82,7 +83,8 @@ test('pause filtering defaults to 12 min/km and supports editing and disabling',
 test('pace filtering has a gear button and keeps its cutoff inside the dialog', () => {
   const states = [];
   const { RunPointFiltering } = load('RunPointFiltering.tsx', false, states);
-  const tree = RunPointFiltering({ value: DEFAULT_CHART_SETTINGS.pointFilter, onChange() {} });
+  const tree = RunPointFiltering({ value: DEFAULT_CHART_SETTINGS.pointFilter,
+    counts: { hidden: 2, total: 10, isSelection: false }, onChange() {} });
   const gear = find(tree, element => element.type === 'button' && element.props['aria-label'] === 'Configure pace filter')[0];
   assert.equal(gear.props['aria-haspopup'], 'dialog');
   gear.props.onClick();

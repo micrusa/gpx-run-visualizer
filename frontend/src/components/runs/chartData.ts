@@ -39,16 +39,19 @@ export function chartData(points: RunPoint[], axis: XAxis, selection: RunSelecti
   return result;
 }
 
-// Filtering precedes smoothing so a pause cannot bleed into nearby moving samples.
-export function graphValues(points: RunPoint[], settings: ChartSettings): Record<Metric, (number | null)[]> {
-  const filter = settings.pointFilter;
-  const excluded = points.map((point, index) => {
+export function paceFilterExclusions(points: RunPoint[], filter: PointFilter): boolean[] {
+  return points.map((point, index) => {
     if (!filter.enabled || !Number.isFinite(filter.maxPaceSecondsPerKm) || filter.maxPaceSecondsPerKm <= 0) return false;
     if (point.paceSecondsPerKm != null) return point.paceSecondsPerKm >= filter.maxPaceSecondsPerKm;
     const previous = points[index - 1];
     return !!previous && previous.segment === point.segment && point.timeSeconds != null && previous.timeSeconds != null
       && point.timeSeconds > previous.timeSeconds && point.distanceMeters <= previous.distanceMeters;
   });
+}
+
+// Filtering precedes smoothing so a pause cannot bleed into nearby moving samples.
+export function graphValues(points: RunPoint[], settings: ChartSettings,
+    excluded = paceFilterExclusions(points, settings.pointFilter)): Record<Metric, (number | null)[]> {
   return Object.fromEntries(METRIC_KEYS.map(metric => {
     const raw = points.map((point, index) => excluded[index] || point[metric] == null || !Number.isFinite(point[metric]) ? null : point[metric]);
     const setting = settings.smoothing[metric];
