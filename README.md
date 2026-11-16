@@ -1,5 +1,7 @@
 # GPX Run Visualizer
 
+Import GPX files and explore your runs with an interactive map and linked charts for pace, elevation, grade, and heart rate when available. Select a section to see its stats or compare two metrics.
+
 Next.js + TypeScript, Spring Boot (Java 21), and PostGIS (PostgreSQL 17).
 
 ## Development
