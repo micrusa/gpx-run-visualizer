@@ -30,7 +30,7 @@ export function AuthForm() {
       <form onSubmit={submit}>
         <label htmlFor="username">Username</label>
         <input id="username" autoComplete="username" required minLength={3} maxLength={50}
-          pattern="[a-z0-9_-]+" value={username} onChange={e => setUsername(e.target.value)}
+          pattern={"[a-z0-9_\\-]+"} value={username} onChange={e => setUsername(e.target.value)}
           aria-describedby="username-help" disabled={busy} />
         <small id="username-help">3–50 lowercase letters, numbers, underscores or hyphens.</small>
         <label htmlFor="password">Password</label>
