@@ -7,6 +7,7 @@ import { formatClock, formatStartDate } from "@/components/runs/format";
 import { type Metric, type XAxis } from "@/components/runs/metrics";
 import { RunDisplayControls } from "@/components/runs/RunDisplayControls";
 import { availableMetrics, DEFAULT_CHART_SETTINGS, graphValues, paceFilterExclusions } from "@/components/runs/chartData";
+import { RunExport } from "@/components/runs/RunExport";
 import { RunGraph } from "@/components/runs/RunGraph";
 
 import { useAnimationFrame } from "@/components/runs/useAnimationFrame";
@@ -52,7 +53,10 @@ export function RunExplorer({ run }: { run: RunDetail }) {
     return false;
   }, [run.points, selection]);
   return <>
-    <h1 className="run-title">{run.summary.name?.trim() || "Run"}</h1>
+    <div className="run-detail-heading">
+      <h1 className="run-title">{run.summary.name?.trim() || "Run"}</h1>
+      <RunExport runId={run.summary.id} points={run.points} values={values} excluded={excluded} selection={selection} />
+    </div>
     <p className="run-detail-summary">
       {run.summary.startedAt && <time dateTime={run.summary.startedAt}>{formatStartDate(run.summary.startedAt)}</time>}
       <span>{(run.summary.distanceMeters / 1000).toFixed(2)} km</span>
