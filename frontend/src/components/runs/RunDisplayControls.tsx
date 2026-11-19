@@ -2,7 +2,7 @@ import { type ChartSettings } from "@/components/runs/chartData";
 import { RunMetricOption } from "@/components/runs/RunMetricOption";
 import { RunPointFiltering, type PaceFilterCounts } from "@/components/runs/RunPointFiltering";
 import type { ReactNode } from "react";
-import { METRICS, type Metric, type XAxis } from "@/components/runs/metrics";
+import { isEfficiency, METRICS, type Metric, type XAxis } from "@/components/runs/metrics";
 
 type Props = {
   settings: ChartSettings; onSettings: (settings: ChartSettings) => void;
@@ -17,6 +17,8 @@ export function RunDisplayControls({ available, selected, onSelected, xAxis, onX
     <fieldset><legend>Metrics</legend>
       {METRICS.map(metric => <RunMetricOption key={metric.key} metric={metric} available={available.includes(metric.key)}
         checked={selected.includes(metric.key)} onChecked={checked => onSelected(checked ? [...selected, metric.key] : selected.filter(key => key !== metric.key))}
+        delay={isEfficiency(metric.key) ? { value: settings.heartRateDelay,
+          onChange: heartRateDelay => onSettings({ ...settings, heartRateDelay }) } : undefined}
         smoothing={settings.smoothing[metric.key]} onSmoothing={value => onSettings({ ...settings, smoothing: { ...settings.smoothing, [metric.key]: value } })} />)}
     </fieldset>
     <RunPointFiltering value={settings.pointFilter} counts={filterCounts} onChange={pointFilter => onSettings({ ...settings, pointFilter })} />

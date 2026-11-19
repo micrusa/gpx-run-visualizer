@@ -14,7 +14,8 @@ function setup() {
   const module = { exports: {} };
   const load = name => name === 'react' ? { ...React, useRef: value => ({ current: value }) }
     : name === 'recharts' ? { usePlotArea: () => area, ZIndexLayer: ({ children }) => children, DefaultZIndexes: { label: 2000 } }
-    : name.endsWith('/chartScale') ? scales : require(name);
+    : name.endsWith('/chartScale') ? scales
+    : name.endsWith('/metrics') ? { isPace: key => ['paceSecondsPerKm', 'gradeAdjustedPace'].includes(key) } : require(name);
   new Function('require', 'module', 'exports', code)(load, module, module.exports);
   const changes = [], resets = [], dragging = [];
   const y = { paceSecondsPerKm: [200, 400], elevationMeters: [100, 200], gradePercent: [-5, 5], heartRate: [100, 180] };

@@ -1,7 +1,7 @@
 import { useRef, type PointerEvent, type KeyboardEvent } from "react";
 import { usePlotArea, ZIndexLayer, DefaultZIndexes } from "recharts";
-import { scaleDomain, shiftDomain, type Domain } from "@/components/runs/chartScale";
-import { type Metric } from "@/components/runs/metrics";
+import { nonNegative, scaleDomain, shiftDomain, type Domain } from "@/components/runs/chartScale";
+import { isPace, type Metric } from "@/components/runs/metrics";
 
 export const AXIS_WIDTH = 76;
 export type ScaleUpdate = { x?: Domain; y?: Partial<Record<Metric, Domain>> };
@@ -15,7 +15,6 @@ type Drag = {
   axis: Axis; pointer: number; startX: number; startY: number; lastX: number; lastY: number;
   domain: Domain; current: Domain; scaling: boolean;
 };
-const nonNegative = (key: Metric) => key === "paceSecondsPerKm" || key === "heartRate";
 
 export function RunChartGestures({ metrics, x, y, onChange, onReset, onDragging }: Props) {
   const area = usePlotArea();
@@ -46,7 +45,7 @@ export function RunChartGestures({ metrics, x, y, onChange, onReset, onDragging 
       onChange({ x: start.current });
     } else {
       start.current = start.scaling ? scaleDomain(start.domain, Math.exp(dy * 3), nonNegative(start.axis))
-        : shiftDomain(start.domain, start.axis === "paceSecondsPerKm" ? -dy : dy, nonNegative(start.axis));
+        : shiftDomain(start.domain, isPace(start.axis) ? -dy : dy, nonNegative(start.axis));
       onChange({ y: { [start.axis]: start.current } });
     }
     start.lastX = event.clientX; start.lastY = event.clientY;
@@ -64,7 +63,7 @@ export function RunChartGestures({ metrics, x, y, onChange, onReset, onDragging 
     event.preventDefault();
     if (axis === "x") onChange({ x: event.shiftKey ? scaleDomain(x, Math.exp(-direction * .15), true) : shiftDomain(x, direction * .1, true) });
     else onChange({ y: { [axis]: event.shiftKey ? scaleDomain(y[axis], Math.exp(-direction * .15), nonNegative(axis))
-      : shiftDomain(y[axis], (axis === "paceSecondsPerKm" ? -direction : direction) * .1, nonNegative(axis)) } });
+      : shiftDomain(y[axis], (isPace(axis) ? -direction : direction) * .1, nonNegative(axis)) } });
   }
   const handlers = (axis: Axis) => ({
     onPointerDown: (event: PointerEvent<SVGRectElement>) => begin(event, axis),

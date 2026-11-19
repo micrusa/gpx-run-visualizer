@@ -4,9 +4,9 @@ import { type RunSelection } from "@/lib/runSelectionService";
 import { RunSelectionSummary } from "@/components/runs/RunSelectionSummary";
 import { type RunDetail } from "@/lib/runService";
 import { formatClock, formatStartDate } from "@/components/runs/format";
-import { METRICS, type Metric, type XAxis } from "@/components/runs/metrics";
+import { type Metric, type XAxis } from "@/components/runs/metrics";
 import { RunDisplayControls } from "@/components/runs/RunDisplayControls";
-import { DEFAULT_CHART_SETTINGS, graphValues, paceFilterExclusions } from "@/components/runs/chartData";
+import { availableMetrics, DEFAULT_CHART_SETTINGS, graphValues, paceFilterExclusions } from "@/components/runs/chartData";
 import { RunGraph } from "@/components/runs/RunGraph";
 
 import { useAnimationFrame } from "@/components/runs/useAnimationFrame";
@@ -17,7 +17,7 @@ const RunMap = dynamic(() => import("@/components/runs/RunMap"), {
 });
 
 export function RunExplorer({ run }: { run: RunDetail }) {
-  const available = useMemo(() => METRICS.filter(metric => run.points.some(point => point[metric.key] != null)).map(metric => metric.key), [run.points]);
+  const available = useMemo(() => availableMetrics(run.points), [run.points]);
   const [selected, setSelected] = useState<Metric[]>(() => {
     const defaults = available.filter(key => key === "paceSecondsPerKm" || key === "elevationMeters");
     return defaults.length ? defaults : available.slice(0, 1);
@@ -65,11 +65,11 @@ export function RunExplorer({ run }: { run: RunDetail }) {
           <RunGraph key={selection ? `${selection.start}:${selection.end}` : "full"} points={run.points}
             selected={selected} xAxis={xAxis} settings={settings} values={values} onHover={onHover} selection={selection} onSelect={selectPeriod} onBack={back} />
         </section>
-        <RunRegression points={run.points} selection={selection} settings={settings} values={values} />
+        <RunRegression metrics={available} points={run.points} selection={selection} values={values} />
       </div>
       <RunDisplayControls settings={settings} onSettings={setSettings} filterCounts={filterCounts} available={available} selected={selected} onSelected={setSelected}
         xAxis={xAxis} onXAxis={axis => { onHover(null); setXAxis(axis); }} hasTime={hasTime}>
-        {selection && <RunSelectionSummary points={run.points} selection={selection} />}
+        {selection && <RunSelectionSummary points={run.points} selection={selection} values={values} />}
       </RunDisplayControls>
     </div>
   </>;

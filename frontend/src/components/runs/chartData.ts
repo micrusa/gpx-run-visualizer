@@ -1,25 +1,33 @@
 import type { RunSelection } from "@/lib/runSelectionService";
 import type { RunPoint } from "@/lib/runService";
-import type { Metric, XAxis } from "@/components/runs/metrics";
+import type { Metric, RecordedMetric, XAxis } from "@/components/runs/metrics";
 
 export type Smoothing = { enabled: boolean; points: number };
 export type PointFilter = { enabled: boolean; maxPaceSecondsPerKm: number };
-export type ChartSettings = { smoothing: Record<Metric, Smoothing>; pointFilter: PointFilter };
+export type HeartRateDelay = { enabled: boolean; seconds: number };
+export type ChartSettings = {
+  smoothing: Record<Metric, Smoothing>; pointFilter: PointFilter; heartRateDelay: HeartRateDelay;
+};
 export const DEFAULT_CHART_SETTINGS: ChartSettings = {
   smoothing: {
-    paceSecondsPerKm: { enabled: true, points: 5 },
+    paceSecondsPerKm: { enabled: true, points: 10 },
     elevationMeters: { enabled: false, points: 5 },
     gradePercent: { enabled: true, points: 5 },
     heartRate: { enabled: false, points: 5 },
+    gradeAdjustedPace: { enabled: false, points: 5 },
+    beatsPerKm: { enabled: true, points: 10 },
+    efficiencyFactor: { enabled: true, points: 10 },
   },
-  pointFilter: { enabled: true, maxPaceSecondsPerKm: 12 * 60 },
+  pointFilter: { enabled: false, maxPaceSecondsPerKm: 12 * 60 },
+  heartRateDelay: { enabled: false, seconds: 5 },
 };
-const METRIC_KEYS: Metric[] = ["paceSecondsPerKm", "elevationMeters", "gradePercent", "heartRate"];
 
-export type ChartPoint = {
-  x: number; index: number | null; paceSecondsPerKm: number | null;
-  elevationMeters: number | null; gradePercent: number | null; heartRate: number | null;
-};
+export type ChartPoint = { x: number; index: number | null } & Record<Metric, number | null>;
+
+export function availableMetrics(points: RunPoint[]): Metric[] {
+  const values = graphValues(points, DEFAULT_CHART_SETTINGS);
+  return (Object.keys(values) as Metric[]).filter(key => values[key].some(value => value != null));
+}
 
 export function chartData(points: RunPoint[], axis: XAxis, selection: RunSelection | null = null, settings: ChartSettings = DEFAULT_CHART_SETTINGS, values = graphValues(points, settings)): ChartPoint[] {
   const result: ChartPoint[] = [];
@@ -30,13 +38,25 @@ export function chartData(points: RunPoint[], axis: XAxis, selection: RunSelecti
     const x = axis === "distance" ? point.distanceMeters / 1000 : point.timeSeconds;
     if (x == null) { gap = true; return; }
     if (result.length && (gap || previousSegment !== point.segment)) {
-      result.push({ x, index: null, paceSecondsPerKm: null, elevationMeters: null, gradePercent: null, heartRate: null });
+      result.push(chartPoint(x, null, values));
     }
-    result.push({ x, index, paceSecondsPerKm: values.paceSecondsPerKm[index], elevationMeters: values.elevationMeters[index],
-      gradePercent: values.gradePercent[index], heartRate: values.heartRate[index] });
+    result.push(chartPoint(x, index, values));
     previousSegment = point.segment; gap = false;
   });
   return result;
+}
+
+function chartPoint(x: number, index: number | null, values: ReturnType<typeof graphValues>): ChartPoint {
+  return {
+    x, index,
+    paceSecondsPerKm: index == null ? null : values.paceSecondsPerKm[index],
+    elevationMeters: index == null ? null : values.elevationMeters[index],
+    gradePercent: index == null ? null : values.gradePercent[index],
+    heartRate: index == null ? null : values.heartRate[index],
+    gradeAdjustedPace: index == null ? null : values.gradeAdjustedPace[index],
+    beatsPerKm: index == null ? null : values.beatsPerKm[index],
+    efficiencyFactor: index == null ? null : values.efficiencyFactor[index],
+  };
 }
 
 export function paceFilterExclusions(points: RunPoint[], filter: PointFilter): boolean[] {
@@ -52,13 +72,77 @@ export function paceFilterExclusions(points: RunPoint[], filter: PointFilter): b
 // Filtering precedes smoothing so a pause cannot bleed into nearby moving samples.
 export function graphValues(points: RunPoint[], settings: ChartSettings,
     excluded = paceFilterExclusions(points, settings.pointFilter)): Record<Metric, (number | null)[]> {
-  return Object.fromEntries(METRIC_KEYS.map(metric => {
-    const raw = points.map((point, index) => excluded[index] || point[metric] == null || !Number.isFinite(point[metric]) ? null : point[metric]);
-    const setting = settings.smoothing[metric];
-    if (!setting.enabled) return [metric, raw];
-    const window = Number.isSafeInteger(setting.points) && setting.points >= 1 ? setting.points : 1;
-    return [metric, smooth(points, raw, window)];
-  })) as Record<Metric, (number | null)[]>;
+  function raw(metric: RecordedMetric) {
+    return points.map((point, index) => {
+      const value = point[metric];
+      return excluded[index] || value == null || !Number.isFinite(value) ? null : value;
+    });
+  }
+
+  function applySmoothing(metric: Metric, samples: (number | null)[]) {
+    const { enabled, points: window } = settings.smoothing[metric];
+    return enabled && Number.isSafeInteger(window) && window > 1 ? smooth(points, samples, window) : samples;
+  }
+
+  const pace = raw("paceSecondsPerKm");
+  const hr = raw("heartRate");
+  const gradePercent = applySmoothing("gradePercent", raw("gradePercent"));
+  const adjusted = pace.map((value, index) => {
+    const grade = gradePercent[index];
+    if (value == null || value <= 0 || grade == null) return null;
+    // Minetti et al. (2002), doi:10.1152/japplphysiol.01177.2001. Limit the fit to measured slopes.
+    const slope = Math.max(-0.45, Math.min(0.45, grade / 100));
+    const cost = ((((155.4 * slope - 30.4) * slope - 43.3) * slope + 46.3) * slope + 19.5) * slope + 3.6;
+    return value * (3.6 / cost);
+  });
+
+  function efficiency(metric: "beatsPerKm" | "efficiencyFactor", source: (number | null)[]) {
+    const speed = source.map(value => value != null && value > 0 ? 60000 / value : null);
+    const aligned = alignSpeed(points, speed, settings.heartRateDelay);
+    const pairedHr = hr.map((value, index) => value != null && value > 0 && aligned[index] != null ? value : null);
+    const pairedSpeed = aligned.map((value, index) => pairedHr[index] == null ? null : value);
+    const avgSpeed = applySmoothing(metric, pairedSpeed);
+    const avgHr = applySmoothing(metric, pairedHr);
+    return avgSpeed.map((value, index) => {
+      const rate = avgHr[index];
+      if (value == null || value <= 0 || rate == null || rate <= 0) return null;
+      return metric === "beatsPerKm" ? 1000 * rate / value : value / rate;
+    });
+  }
+
+  return {
+    paceSecondsPerKm: applySmoothing("paceSecondsPerKm", pace),
+    elevationMeters: applySmoothing("elevationMeters", raw("elevationMeters")),
+    gradePercent,
+    heartRate: applySmoothing("heartRate", hr),
+    gradeAdjustedPace: applySmoothing("gradeAdjustedPace", adjusted),
+    beatsPerKm: efficiency("beatsPerKm", pace),
+    efficiencyFactor: efficiency("efficiencyFactor", adjusted),
+  };
+}
+
+function alignSpeed(points: RunPoint[], speed: (number | null)[], delay: HeartRateDelay) {
+  if (!delay.enabled || !Number.isFinite(delay.seconds) || delay.seconds <= 0) return speed;
+  let start = 0, left = 0;
+  return points.map((point, index) => {
+    const time = point.timeSeconds;
+    if (time == null || !Number.isFinite(time) || speed[index] == null) {
+      start = left = index + 1;
+      return null;
+    }
+    const previous = points[index - 1];
+    if (index > start && (point.segment !== previous.segment || time <= (previous.timeSeconds ?? time))) {
+      start = left = index;
+    }
+    const target = time - delay.seconds;
+    if (target < points[start].timeSeconds!) return null;
+    while (left < index && points[left + 1].timeSeconds! <= target) left++;
+    const leftTime = points[left].timeSeconds!;
+    const leftSpeed = speed[left]!;
+    if (leftTime === target || left === index) return leftSpeed;
+    const fraction = (target - leftTime) / (points[left + 1].timeSeconds! - leftTime);
+    return leftSpeed + fraction * (speed[left + 1]! - leftSpeed);
+  });
 }
 
 // Prefix sums keep even very large smoothing windows linear in the number of samples.

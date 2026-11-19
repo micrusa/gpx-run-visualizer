@@ -18,7 +18,11 @@ export function RunPointFiltering({ value, counts, onChange }: { value: PointFil
       {counts.hidden.toLocaleString()} of {counts.total.toLocaleString()} {counts.isSelection ? "selected" : "run"} samples excluded
     </small>}
     <RunSettingsDialog id={id} title="Filter by pace" open={open} onClose={() => setOpen(false)}>
+      <p className="run-settings-description" id="pace-filter-description">
+        Excludes pauses and samples at or slower than the cutoff from the chart and regression.
+      </p>
       <label className="run-option"><input id="pace-filter-dialog-enabled" type="checkbox" checked={value.enabled}
+        aria-describedby="pace-filter-description"
         onChange={event => onChange({ ...value, enabled: event.target.checked })} />Enabled</label>
       <label htmlFor="pace-cutoff">Keep pace below (min/km)</label>
       <input id="pace-cutoff" type="number" min="0" step="any" value={value.maxPaceSecondsPerKm / 60} disabled={!value.enabled}

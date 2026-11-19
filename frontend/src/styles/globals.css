@@ -67,7 +67,7 @@ form button { margin-top: .7rem; }
 main.run-detail-layout { max-width: 76rem; }
 .run-title { overflow-wrap: anywhere; }
 .run-detail-summary { display: flex; flex-wrap: wrap; gap: .8rem; color: var(--muted); margin-bottom: .7rem; }
-.run-explorer { display: grid; grid-template-columns: minmax(0, 1fr) 13rem; gap: .6rem; align-items: start; }
+.run-explorer { display: grid; grid-template-columns: minmax(0, 1fr) 15rem; gap: .6rem; align-items: start; }
 .run-visuals { min-width: 0; display: grid; gap: .6rem; }
 .run-map, .run-map-loading { height: 320px; width: 100%; border: 1px solid var(--line); z-index: 0; }
 .run-map-loading { display: grid; place-content: center; background: var(--panel); }
@@ -98,6 +98,7 @@ main.run-detail-layout { max-width: 76rem; }
 .run-selection-summary dl > div { display: flex; justify-content: space-between; gap: .35rem; border-top: 1px solid var(--rule); padding: .22rem 0; }
 .run-selection-summary dt { color: var(--muted); font-size: .8rem; }
 .run-selection-summary dd { margin: 0; font-size: .8rem; font-weight: bold; text-align: right; }
+.run-selection-chart-averages { display: block; margin-top: .5rem; }
 
 .run-metric-option { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: .3rem; }
 .run-config-button { display: grid; place-items: center; width: 1.5rem; height: 1.5rem; padding: 0; color: var(--muted); }
@@ -109,6 +110,8 @@ main.run-detail-layout { max-width: 76rem; }
 .run-settings-close { padding: .05rem .36rem; font-size: 1.15rem; line-height: 1.15; }
 .run-settings-dialog label:not(.run-option) { margin: .5rem 0 .25rem; font-size: .85rem; font-weight: normal; }
 .run-settings-dialog .run-option { margin-top: 0; }
+.run-settings-description { margin: 0 0 .5rem; color: var(--muted); font-size: .8rem; line-height: 1.4; }
+.run-settings-section { margin-top: .85rem; padding-top: .65rem; border-top: 1px solid var(--rule); }
 
 .regression-controls { display: flex; flex-wrap: wrap; gap: .55rem; margin-bottom: .4rem; }
 .regression-controls label { flex: 1 1 10rem; margin: .2rem 0 0; }

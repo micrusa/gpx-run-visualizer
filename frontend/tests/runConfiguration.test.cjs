@@ -69,7 +69,8 @@ test('pause filtering defaults to 12 min/km and supports editing and disabling',
   const inputs = find(tree, element => element.type === 'input');
   const enabled = inputs.find(input => input.props.id === 'pace-filter-enabled');
   const cutoff = inputs.find(input => input.props.id === 'pace-cutoff');
-  assert.equal(enabled.props.checked, true);
+  assert.equal(enabled.props.checked, false);
+  assert.equal(cutoff.props.disabled, true);
   assert.equal(cutoff.props.value, 12);
   cutoff.props.onChange({ currentTarget: { valueAsNumber: 12.5 } });
   assert.equal(changes.at(-1).maxPaceSecondsPerKm, 750);
@@ -123,4 +124,19 @@ test('dialog supports Close, Escape and outside clicks without dismissing inside
   assert.equal(closed, 2);
   tree.props.onClick({ target, currentTarget: target, clientX: 50, clientY: 150 });
   assert.equal(closed, 3);
+});
+
+test('efficiency settings expose an optional HR delay with a five-second default', () => {
+  const { MetricConfiguration } = load('MetricConfiguration.tsx', true);
+  const changes = [];
+  const tree = MetricConfiguration({ metric: 'beatsPerKm', label: 'Beats per km',
+    value: DEFAULT_CHART_SETTINGS.smoothing.beatsPerKm, onChange() {},
+    delay: { value: DEFAULT_CHART_SETTINGS.heartRateDelay, onChange: value => changes.push(value) } });
+  const [, , enabled, seconds] = find(tree, element => element.type === 'input');
+  assert.equal(enabled.props.checked, false);
+  assert.equal(seconds.props.disabled, true);
+  assert.equal(seconds.props.value, 5);
+  enabled.props.onChange({ target: { checked: true } });
+  seconds.props.onChange({ currentTarget: { valueAsNumber: 7.5 } });
+  assert.deepEqual(changes, [{ enabled: true, seconds: 5 }, { enabled: false, seconds: 7.5 }]);
 });

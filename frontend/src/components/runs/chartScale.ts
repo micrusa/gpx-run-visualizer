@@ -1,6 +1,10 @@
 import type { ChartPoint } from "@/components/runs/chartData";
 import type { Metric } from "@/components/runs/metrics";
 
+export function nonNegative(metric: Metric) {
+  return metric !== "elevationMeters" && metric !== "gradePercent";
+}
+
 export function chartDomain(data: ChartPoint[], metric: Metric): [number, number] {
   const values = data.map(point => point[metric])
     .filter((value): value is number => value != null && Number.isFinite(value)).sort((a, b) => a - b);
@@ -17,7 +21,7 @@ export function chartDomain(data: ChartPoint[], metric: Metric): [number, number
   const padding = (high - low) * .05 || Math.max(Math.abs(low) * .05, 1);
   low -= padding;
   high += padding;
-  if (metric === "paceSecondsPerKm" || metric === "heartRate") low = Math.max(0, low);
+  if (nonNegative(metric)) low = Math.max(0, low);
   return [low, high];
 }
 

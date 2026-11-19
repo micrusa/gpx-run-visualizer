@@ -7,7 +7,7 @@ import { chartData, type graphValues, type ChartSettings } from "@/components/ru
 import { chartDomain, type Domain } from "@/components/runs/chartScale";
 import { RunChartGestures, AXIS_WIDTH, type ScaleUpdate } from "@/components/runs/RunChartGestures";
 import { formatClock } from "@/components/runs/format";
-import { METRICS, metricValue, type Metric, type XAxis } from "@/components/runs/metrics";
+import { isPace, METRICS, metricValue, type Metric, type XAxis } from "@/components/runs/metrics";
 
 import { sampleChart } from "@/components/runs/chartSampling";
 import { useAnimationFrame } from "@/components/runs/useAnimationFrame";
@@ -56,7 +56,7 @@ export const RunGraph = memo(function RunGraph({ points, selected, xAxis, onHove
       <li>Drag axis to pan · Shift-drag to scale</li>
       <li>Double-click to reset</li>
     </ul>
-    <div className="run-chart-scroll"><div className="run-chart">
+    <div className="run-chart-scroll"><div className="run-chart" style={{ minWidth: Math.max(450, metrics.length * AXIS_WIDTH + 180) }}>
       <ResponsiveContainer width="100%" height="100%" minWidth={0} onResize={setWidth}>
         <LineChart data={rendered} accessibilityLayer margin={{ top: 12, right: 8, bottom: 24, left: 8 }}
           onMouseMove={state => {
@@ -70,7 +70,7 @@ export const RunGraph = memo(function RunGraph({ points, selected, xAxis, onHove
             label={{ value: xAxis === "time" ? "Time (min:sec)" : "Distance (km)", position: "insideBottom", offset: -14 }} />
           {metrics.map((metric, index) => <YAxis key={metric.key} yAxisId={metric.axisId}
             orientation={index % 2 ? "right" : "left"} width={AXIS_WIDTH} domain={visibleY[metric.key]} allowDataOverflow
-            reversed={metric.key === "paceSecondsPerKm"} tick={{ fill: metric.color, fontSize: 12 }}
+            reversed={isPace(metric.key)} tick={{ fill: metric.color, fontSize: 12 }}
             tickFormatter={value => metricValue(metric.key, Number(value))} />)}
           <Tooltip active={dragging ? false : undefined} labelFormatter={value => xAxis === "time" ? `${formatClock(Number(value))} elapsed` : `${Number(value).toFixed(2)} km`}
             formatter={(value, name) => {
