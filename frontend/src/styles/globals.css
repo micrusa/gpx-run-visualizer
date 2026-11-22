@@ -127,6 +127,30 @@ main.run-detail-layout { max-width: 76rem; }
 .regression-controls select { display: block; width: 100%; margin-top: .22rem; padding: .24rem; }
 .regression-summary { display: flex; flex-wrap: wrap; gap: .65rem; font-size: .85rem; }
 
+.charts-stack { display: grid; gap: .7rem; }
+.charts-stack > h1 { margin-bottom: 0; }
+.charts-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .55rem; padding: .5rem .65rem; }
+.charts-group { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; }
+.charts-button-active { background: var(--link); border-color: var(--link); color: #fff; }
+.charts-button-active:hover { background: #224264; }
+.charts-range-label { font-weight: bold; padding: 0 .35rem; white-space: nowrap; }
+.charts-summary { margin: 0; }
+.charts-note { margin: .4rem 0 0; }
+.charts-panel-toolbar { flex-wrap: wrap; margin-bottom: .35rem; }
+.charts-chart { height: 280px; min-width: 450px; }
+.charts-metric-picker { border: 1px solid var(--rule); padding: .3rem .55rem; margin: .25rem 0 .45rem; }
+.charts-metric-options { display: flex; flex-wrap: wrap; gap: .15rem .85rem; }
+.charts-metric-option { margin: .18rem 0; font-size: .85rem; cursor: pointer; }
+.charts-metric-empty { opacity: .45; cursor: default; }
+.charts-swatch { display: inline-block; width: 9px; height: 9px; border-radius: 1px; flex-shrink: 0; }
+.charts-empty { color: var(--muted); margin: .5rem 0 .2rem; }
+.charts-section-heading { margin: .2rem 0 .4rem; }
+.charts-table tbody tr { cursor: default; }
+.charts-table tbody tr:hover { background: transparent; }
+.charts-diff { display: inline-flex; align-items: center; gap: .15rem; margin-left: .4rem; font-size: .78rem; font-variant-numeric: tabular-nums; vertical-align: baseline; }
+.charts-diff-positive { color: #3d6b3d; }
+.charts-diff-negative { color: #992b24; }
+
 @media (max-width: 690px) {
   main { padding: 0 .65rem; }
   .run-explorer { grid-template-columns: minmax(0, 1fr); }
